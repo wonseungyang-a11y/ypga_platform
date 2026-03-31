@@ -1,0 +1,10 @@
+{
+  "links": [
+    { "href": "/", "label": "홈" },
+    { "href": "/members", "label": "회원" },
+    { "href": "/tournaments", "label": "대회" },
+    { "href": "/participants", "label": "조편성" },
+    { "href": "/resources", "label": "자료실" },
+    { "href": "/ask", "label": "데이터 분석" }
+  ]
+}

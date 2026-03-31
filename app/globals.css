@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f6f9;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-noto-kr), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+
+  /* 연세대 블루 · 보성고 그린 — 브랜드 팔레트 */
+  --color-yonsei: #003876;
+  --color-yonsei-50: #e8f0f8;
+  --color-yonsei-100: #d1e0f0;
+  --color-yonsei-200: #a6c4e0;
+  --color-yonsei-300: #7ba8d1;
+  --color-yonsei-600: #004a8c;
+  --color-yonsei-700: #002d56;
+
+  --color-boseong: #1a4d3a;
+  --color-boseong-50: #e8f2ec;
+  --color-boseong-100: #cfe5d8;
+  --color-boseong-300: #6b9f84;
+  --color-boseong-600: #236b4f;
+
+  --color-surface: #f4f6f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0c1220;
+    --foreground: #e8edf4;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-noto-kr), "Malgun Gothic", "Apple SD Gothic Neo",
+    sans-serif;
+}
