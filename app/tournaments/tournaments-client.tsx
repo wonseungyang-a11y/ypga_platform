@@ -5,6 +5,49 @@ import { SiteSearchInput } from "@/components/site-search-input";
 import type { TournamentRow } from "@/lib/tournaments-types";
 import { matchesSearchText } from "@/lib/search-text";
 
+function getTournamentTypeBadge(typeRaw: string): {
+  label: string;
+  className: string;
+} {
+  const t = (typeRaw ?? "").trim();
+  const isRegular = t.includes("정기");
+  const isScreen = t.includes("스크린");
+  if (isRegular) {
+    return {
+      label: "정기총회",
+      className:
+        "inline-flex items-center gap-1 rounded-full border border-yonsei/20 bg-yonsei/10 px-2.5 py-1 text-xs font-semibold text-yonsei ring-1 ring-yonsei/10 dark:border-yonsei-200/20 dark:bg-yonsei-200/10 dark:text-yonsei-100 dark:ring-yonsei-200/20",
+    };
+  }
+  if (isScreen) {
+    return {
+      label: "스크린총회",
+      className:
+        "inline-flex items-center gap-1 rounded-full border border-boseong/25 bg-boseong/10 px-2.5 py-1 text-xs font-semibold text-boseong ring-1 ring-boseong/10 dark:border-boseong-200/25 dark:bg-boseong-200/10 dark:text-boseong-100 dark:ring-boseong-200/20",
+    };
+  }
+  return {
+    label: t || "기타",
+    className:
+      "inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200",
+  };
+}
+
+function TournamentTypeBadge({ type }: { type: string }) {
+  const badge = getTournamentTypeBadge(type);
+  const icon = badge.label.includes("정기")
+    ? "📌"
+    : badge.label.includes("스크린")
+      ? "🖥️"
+      : "🏌️";
+  return (
+    <span className={badge.className} title={type}>
+      <span aria-hidden>{icon}</span>
+      <span>{badge.label}</span>
+    </span>
+  );
+}
+
 function formatDate(iso: string): string {
   const d = new Date(iso + "T12:00:00");
   if (Number.isNaN(d.getTime())) return iso;
@@ -69,7 +112,9 @@ function TournamentTableBody({ rows }: { rows: TournamentRow[] }) {
             {formatDate(r.date)}
           </td>
           <td className="px-3 py-2 text-zinc-800 dark:text-zinc-200">{r.location}</td>
-          <td className="px-3 py-2 whitespace-nowrap">{r.type}</td>
+          <td className="px-3 py-2 whitespace-nowrap">
+            <TournamentTypeBadge type={r.type} />
+          </td>
           <td className="px-3 py-2 whitespace-nowrap">{r.format}</td>
           <td className="px-3 py-2 text-right tabular-nums">{dash(r.participants)}</td>
           <td className="px-3 py-2">
@@ -119,9 +164,7 @@ function TournamentMobileList({ rows, sectionKey }: { rows: TournamentRow[]; sec
             {formatDate(r.date)} · {r.location}
           </div>
           <div className="mt-2 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full bg-zinc-100 px-2 py-0.5 dark:bg-zinc-800">
-              {r.type}
-            </span>
+            <TournamentTypeBadge type={r.type} />
             <span className="rounded-full bg-zinc-100 px-2 py-0.5 dark:bg-zinc-800">
               {r.format}
             </span>
@@ -170,9 +213,22 @@ function TournamentSection({
       <div className="border-b border-zinc-200 pb-3 dark:border-zinc-800">
         <h2
           id={`heading-${sectionKey}`}
-          className="text-lg font-semibold text-zinc-900 dark:text-zinc-50"
+          className="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50"
         >
-          {title}
+          <span
+            className={
+              title.includes("정기")
+                ? "inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-yonsei/15 to-yonsei/5 px-3 py-1 ring-1 ring-yonsei/15 dark:from-yonsei-200/15 dark:to-yonsei-200/5 dark:ring-yonsei-200/20"
+                : title.includes("스크린")
+                  ? "inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-boseong/15 to-boseong/5 px-3 py-1 ring-1 ring-boseong/15 dark:from-boseong-200/15 dark:to-boseong-200/5 dark:ring-boseong-200/20"
+                  : "inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1 ring-1 ring-zinc-200 dark:bg-zinc-900/50 dark:ring-zinc-800"
+            }
+          >
+            <span aria-hidden>
+              {title.includes("정기") ? "📌" : title.includes("스크린") ? "🖥️" : "🏌️"}
+            </span>
+            <span>{title}</span>
+          </span>
         </h2>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           {rows.length}건 (일자 최신순)
