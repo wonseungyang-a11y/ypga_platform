@@ -104,8 +104,8 @@ export function AskDataClient({
               GOOGLE_GENERATIVE_AI_API_KEY
             </code>
             )를{" "}
-            <code className="text-xs">.env.local</code>에 넣고 개발 서버를
-            다시 시작하세요.
+            로컬은 <code className="text-xs">.env.local</code>에, 배포(Vercel)는
+            Project Settings → Environment Variables에 추가한 뒤 재배포하세요.
           </p>
         </div>
       ) : null}
@@ -119,14 +119,19 @@ export function AskDataClient({
             <>
               <p className="font-semibold">Supabase에 연결할 수 없습니다</p>
               <p className="mt-2">
-                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
-                  NEXT_PUBLIC_SUPABASE_URL
-                </code>{" "}
-                및{" "}
+                배포(Vercel) 환경 변수에{" "}
                 <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
                   SUPABASE_SERVICE_ROLE_KEY
                 </code>
-                를 확인하세요.
+                와{" "}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                  SUPABASE_URL
+                </code>{" "}
+                (또는{" "}
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                  NEXT_PUBLIC_SUPABASE_URL
+                </code>{" "}
+                )을 확인하세요.
               </p>
             </>
           ) : (

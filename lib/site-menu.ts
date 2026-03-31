@@ -46,9 +46,9 @@ const NAV_DEFINITION: NavDef[] = [
   },
   {
     href: "/ask",
-    label: "데이터 분석",
+    label: "AI 분석",
     card: {
-      title: "데이터 분석",
+      title: "AI 분석",
       desc: "AI 데이터 통계 질문",
     },
   },

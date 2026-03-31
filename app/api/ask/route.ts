@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "Supabase에 연결할 수 없습니다. NEXT_PUBLIC_SUPABASE_URL 과 SUPABASE_SERVICE_ROLE_KEY 를 확인하고 마이그레이션(003)을 적용하세요.",
+          "Supabase에 연결할 수 없습니다. 서버 환경 변수 SUPABASE_SERVICE_ROLE_KEY 및 (SUPABASE_URL 또는 NEXT_PUBLIC_SUPABASE_URL)을 확인하고 마이그레이션(003)을 적용하세요.",
       },
       { status: 503 },
     );

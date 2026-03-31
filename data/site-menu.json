@@ -5,6 +5,6 @@
     { "href": "/tournaments", "label": "대회" },
     { "href": "/participants", "label": "조편성" },
     { "href": "/resources", "label": "자료실" },
-    { "href": "/ask", "label": "데이터 분석" }
+    { "href": "/ask", "label": "AI 분석" }
   ]
 }

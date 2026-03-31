@@ -24,7 +24,7 @@ export default function Home() {
           <PageMarkdownBlock path="/" className="mt-4" />
           <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
             동문 골프 모임을 위한 공간입니다. 아래 메뉴에서 회원·대회·조편성·자료·
-            데이터 분석을 확인하세요.
+            AI 분석을 확인하세요.
           </p>
         </header>
 

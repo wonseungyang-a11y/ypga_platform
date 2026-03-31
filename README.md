@@ -49,7 +49,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
    | `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL |
    | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon 공개 키 |
    | `SUPABASE_SERVICE_ROLE_KEY` | 서비스 롤 키 (서버 전용, 외부 노출 금지) |
-   | `GEMINI_API_KEY` | 데이터 분석(`/api/ask`)용 (없으면 해당 기능만 비활성) |
+   | `GEMINI_API_KEY` | AI 분석(`/api/ask`)용 (없으면 해당 기능만 비활성) |
 
    배포 후 **Redeploy** 한 번 실행하면 값이 반영됩니다.
 
