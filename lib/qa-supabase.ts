@@ -18,9 +18,25 @@ export type YpgaDataRowCountsOutcome =
       hints: readonly string[];
     };
 
+function formatPgError(e: { code?: string | null; message?: string }): string {
+  const codeRaw = e.code != null ? String(e.code).trim() : "";
+  const code = codeRaw.length > 0 ? codeRaw : "ERR";
+  const msg = String(e.message ?? "unknown").replace(/\s+/g, " ").trim();
+  return `${code}: ${msg}`;
+}
+
 function buildRowCountHints(summary: string): readonly string[] {
   const s = summary.toLowerCase();
   const hints: string[] = [];
+
+  if (s.includes("fetch failed") || s.includes("econnrefused") || s.includes("enotfound") || s.includes("getaddrinfo")) {
+    hints.push(
+      "`TypeError: fetch failed` 는 보통 **네트워크/DNS/SSL** 또는 **Supabase 프로젝트 일시 중지(pause)** 때문에 발생합니다. Supabase Dashboard → 해당 프로젝트가 **Active** 인지 확인하고, Vercel 환경 변수의 URL이 `https://xxxx.supabase.co` **정확한 호스트**(복사·붙여넣기 시 숨은 공백·잘못된 문자 없음)인지 확인하세요.",
+    );
+    hints.push(
+      "로컬 터미널에서 `curl -I \"<NEXT_PUBLIC_SUPABASE_URL>/rest/v1/\"` 로 응답이 오는지 확인하면, Vercel 밖에서 호스트 접근 가능 여부를 빠르게 가릴 수 있습니다.",
+    );
+  }
 
   if (
     s.includes("does not exist") ||
@@ -67,23 +83,44 @@ export async function getYpgaDataRowCountsOutcome(): Promise<YpgaDataRowCountsOu
   const supabase = createSupabaseServiceClient();
   if (!supabase) return { ok: false, kind: "no_client" };
 
-  const [m, p, t] = await Promise.all([
-    supabase.from("ypga_members").select("*", { count: "exact", head: true }),
-    supabase
-      .from("ypga_participants")
-      .select("*", { count: "exact", head: true }),
-    supabase
-      .from("ypga_tournaments")
-      .select("*", { count: "exact", head: true }),
-  ]);
+  let m;
+  let p;
+  let t;
+
+  try {
+    [m, p, t] = await Promise.all([
+      supabase.from("ypga_members").select("*", { count: "exact", head: true }),
+      supabase
+        .from("ypga_participants")
+        .select("*", { count: "exact", head: true }),
+      supabase
+        .from("ypga_tournaments")
+        .select("*", { count: "exact", head: true }),
+    ]);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const cause =
+      e instanceof Error && "cause" in e && e.cause != null
+        ? e.cause instanceof Error
+          ? e.cause.message
+          : String(e.cause)
+        : "";
+    const summary = `exception: ${msg}${cause ? ` (${cause})` : ""}`
+      .replace(/\s+/g, " ")
+      .trim();
+    return {
+      ok: false,
+      kind: "query_failed",
+      summary,
+      hints: buildRowCountHints(summary),
+    };
+  }
 
   const errors = [m.error, p.error, t.error].filter(
     (e): e is NonNullable<typeof m.error> => e != null,
   );
   if (errors.length) {
-    const summary = errors
-      .map((e) => `${e.code ?? "ERR"}: ${e.message}`.replace(/\s+/g, " ").trim())
-      .join(" | ");
+    const summary = errors.map((e) => formatPgError(e)).join(" | ");
     return {
       ok: false,
       kind: "query_failed",
