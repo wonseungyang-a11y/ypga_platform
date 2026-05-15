@@ -3,7 +3,7 @@ import { hasPublicPdfDocuments } from "@/lib/ask-resources-text";
 import { buildGeminiDataBundle } from "@/lib/ask-gemini-context";
 import { analyzeWithGemini, isGeminiConfigured } from "@/lib/gemini";
 import { parseDataQuestion } from "@/lib/qa-parse";
-import { getYpgaDataRowCounts, runDataQuery } from "@/lib/qa-supabase";
+import { getYpgaDataRowCountsOutcome, runDataQuery } from "@/lib/qa-supabase";
 
 export const runtime = "nodejs";
 
@@ -39,16 +39,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const counts = await getYpgaDataRowCounts();
-  if (counts === null) {
+  const countsOutcome = await getYpgaDataRowCountsOutcome();
+  if (!countsOutcome.ok) {
+    if (countsOutcome.kind === "no_client") {
+      return NextResponse.json(
+        {
+          error:
+            "Supabase에 연결할 수 없습니다. 서버 환경 변수 SUPABASE_SERVICE_ROLE_KEY 및 (SUPABASE_URL 또는 NEXT_PUBLIC_SUPABASE_URL, https://xxx.supabase.co 형식·경로 없음)을 확인하고 마이그레이션(003)을 적용하세요.",
+        },
+        { status: 503 },
+      );
+    }
+    const hintBlock = countsOutcome.hints.length
+      ? ` 안내: ${countsOutcome.hints.join(" ")}`
+      : "";
     return NextResponse.json(
       {
-        error:
-          "Supabase에 연결할 수 없습니다. 서버 환경 변수 SUPABASE_SERVICE_ROLE_KEY 및 (SUPABASE_URL 또는 NEXT_PUBLIC_SUPABASE_URL, https://xxx.supabase.co 형식·경로 없음)을 확인하고 마이그레이션(003)을 적용하세요.",
+        error: `Supabase 행 수 조회에 실패했습니다. (${countsOutcome.summary})${hintBlock}`,
       },
       { status: 503 },
     );
   }
+  const counts = countsOutcome.counts;
 
   const hasPdf = hasPublicPdfDocuments();
   const totalRows =

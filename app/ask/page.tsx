@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageMarkdownBlock } from "@/components/page-markdown-block";
 import { hasPublicPdfDocuments } from "@/lib/ask-resources-text";
 import { isGeminiConfigured } from "@/lib/gemini";
-import { getYpgaDataRowCounts } from "@/lib/qa-supabase";
+import { getYpgaDataRowCountsOutcome } from "@/lib/qa-supabase";
 import { isSupabaseServiceConfigured } from "@/lib/supabase/service";
 import { AskDataClient } from "./ask-client";
 
@@ -15,9 +15,14 @@ export const metadata: Metadata = {
 
 export default async function AskPage() {
   const serviceEnvOk = isSupabaseServiceConfigured();
-  const rowCounts = await getYpgaDataRowCounts();
+  const countsOutcome = await getYpgaDataRowCountsOutcome();
+  const rowCounts = countsOutcome.ok ? countsOutcome.counts : null;
+  const supabaseOk = countsOutcome.ok;
+  const supabaseCountDiagnostics =
+    !countsOutcome.ok && countsOutcome.kind === "query_failed"
+      ? { summary: countsOutcome.summary, hints: [...countsOutcome.hints] }
+      : null;
   const hasPdfDocuments = hasPublicPdfDocuments();
-  const supabaseOk = rowCounts !== null;
   const totalRows = rowCounts
     ? rowCounts.members + rowCounts.participants + rowCounts.tournaments
     : 0;
@@ -44,6 +49,7 @@ export default async function AskPage() {
           hasPdfDocuments={hasPdfDocuments}
           supabaseOk={supabaseOk}
           serviceEnvOk={serviceEnvOk}
+          supabaseCountDiagnostics={supabaseCountDiagnostics}
         />
       </div>
 

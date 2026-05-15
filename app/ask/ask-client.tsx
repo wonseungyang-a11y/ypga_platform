@@ -19,6 +19,8 @@ type Props = {
   supabaseOk: boolean;
   /** 서비스 롤 URL·키가 갖춰졌는지(AI 분석 전용) */
   serviceEnvOk: boolean;
+  /** 행 수 head-count 실패 시 서버에서만 수집한 요약(민감정보 제외) */
+  supabaseCountDiagnostics: { summary: string; hints: string[] } | null;
 };
 
 const PLACEHOLDER = "질문을 입력하세요";
@@ -30,6 +32,7 @@ export function AskDataClient({
   hasPdfDocuments,
   supabaseOk,
   serviceEnvOk,
+  supabaseCountDiagnostics,
 }: Props) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
@@ -160,15 +163,36 @@ export function AskDataClient({
             <>
               <p className="font-semibold">Supabase에 연결할 수 없습니다</p>
               <p className="mt-2">
-                환경 변수는 있으나 테이블 조회에 실패했습니다.{" "}
+                환경 변수는 감지됐지만{" "}
                 <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
-                  SUPABASE_SERVICE_ROLE_KEY
+                  ypga_members
                 </code>
-                가 올바른지, 마이그레이션{" "}
+                ·
                 <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
-                  003_ypga_data_tables.sql
+                  ypga_participants
                 </code>
-                적용 여부·프로젝트 일치를 확인하세요.
+                ·
+                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                  ypga_tournaments
+                </code>{" "}
+                행 수 조회가 실패했습니다. 아래 요약과 안내를 참고하세요.
+              </p>
+              {supabaseCountDiagnostics ? (
+                <div className="mt-3 space-y-2 rounded-lg border border-amber-300/60 bg-white/70 p-3 text-xs dark:border-amber-800 dark:bg-amber-950/30">
+                  <p className="font-mono text-[0.7rem] leading-relaxed text-amber-950/90 break-words dark:text-amber-100">
+                    {supabaseCountDiagnostics.summary}
+                  </p>
+                  <ul className="list-inside list-disc space-y-1.5 text-[0.72rem] leading-snug text-amber-950/90 dark:text-amber-50/95">
+                    {supabaseCountDiagnostics.hints.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              <p className="mt-3 text-xs opacity-90">
+                자주 있는 원인: (1) Vercel의 service_role 키가 다른 Supabase
+                프로젝트 것 (2) 마이그레이션 003 미적용 (3) 변수 수정 후
+                재배포 누락
               </p>
             </>
           ) : (
