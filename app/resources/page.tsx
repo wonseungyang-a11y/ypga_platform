@@ -12,7 +12,7 @@ const documents = [
     href: "/documents/ypga-bylaws-230112.pdf",
     title: "YPGA 정관",
     meta: "개정 2023년 1월 12일",
-    description: "연합회 정관 전문 PDF입니다.",
+    description: "동호회 정관 전문 PDF입니다.",
   },
   {
     href: "/documents/ypga-code-of-conduct-210706.pdf",
@@ -29,7 +29,7 @@ export default function ResourcesPage() {
         자료실
       </h1>
       <PageMarkdownBlock path="/resources" className="mt-4" />
-      <p className="mt-3 text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
         정관·회원 행동강령 등 공개 자료를 내려받거나 새 탭에서 볼 수 있습니다.
       </p>
 
@@ -62,7 +62,7 @@ export default function ResourcesPage() {
       <p className="mt-8">
         <Link
           href="/"
-          className="text-sm font-medium text-yonsei underline dark:text-yonsei-200"
+          className="text-sm font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
         >
           ← 홈으로
         </Link>

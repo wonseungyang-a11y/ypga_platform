@@ -26,14 +26,14 @@ export default async function MembersPage() {
           회원 명단
         </h1>
         <PageMarkdownBlock path="/members" className="mt-4" />
-        <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-          연합회 회원의 구분·번호·기수·성명·닉네임·거주지를 한눈에 보고,
+        <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
+          동호회 회원의 구분·번호·기수·성명·닉네임·거주지를 한눈에 보고,
           검색으로 원하는 회원을 빠르게 찾을 수 있습니다.
         </p>
         <p className="mt-4">
           <Link
             href="/"
-            className="text-sm font-medium text-yonsei underline dark:text-yonsei-200"
+            className="text-sm font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
           >
             홈으로
           </Link>

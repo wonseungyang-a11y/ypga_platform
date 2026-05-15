@@ -4,6 +4,7 @@ import { PageMarkdownBlock } from "@/components/page-markdown-block";
 import { hasPublicPdfDocuments } from "@/lib/ask-resources-text";
 import { isGeminiConfigured } from "@/lib/gemini";
 import { getYpgaDataRowCounts } from "@/lib/qa-supabase";
+import { isSupabaseServiceConfigured } from "@/lib/supabase/service";
 import { AskDataClient } from "./ask-client";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AskPage() {
+  const serviceEnvOk = isSupabaseServiceConfigured();
   const rowCounts = await getYpgaDataRowCounts();
   const hasPdfDocuments = hasPublicPdfDocuments();
   const supabaseOk = rowCounts !== null;
@@ -29,7 +31,7 @@ export default async function AskPage() {
         AI 분석
       </h1>
       <PageMarkdownBlock path="/ask" className="mt-4" />
-      <p className="mt-3 text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
         동호회에 쌓인 회원·조편성·대회 기록과 자료실 문서를 바탕으로 질문을
         입력하면 <strong>Google Gemini</strong>가 맥락을 읽고 답변합니다.
       </p>
@@ -41,13 +43,14 @@ export default async function AskPage() {
           rowCounts={rowCounts}
           hasPdfDocuments={hasPdfDocuments}
           supabaseOk={supabaseOk}
+          serviceEnvOk={serviceEnvOk}
         />
       </div>
 
       <p className="mt-10">
         <Link
           href="/"
-          className="text-sm font-medium text-yonsei underline dark:text-yonsei-200"
+          className="text-sm font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
         >
           ← 홈으로
         </Link>

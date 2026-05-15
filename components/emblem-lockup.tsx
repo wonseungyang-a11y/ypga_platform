@@ -31,7 +31,7 @@ export function EmblemLockup({
 
   return (
     <div
-      className={`flex items-center gap-1.5 sm:gap-2 rounded-2xl border border-zinc-200/55 bg-white dark:border-zinc-600/40 dark:bg-white ${pad} ${className}`}
+      className={`flex items-center gap-1.5 sm:gap-2 rounded-2xl border border-border bg-card shadow-sm ${pad} ${className}`}
     >
       <div
         className="relative flex shrink-0 items-center justify-center"
@@ -47,7 +47,7 @@ export function EmblemLockup({
         />
       </div>
       <div
-        className="w-px shrink-0 self-stretch bg-zinc-300/70"
+        className="w-px shrink-0 self-stretch bg-border"
         style={{ minHeight: dividerH }}
         aria-hidden
       />

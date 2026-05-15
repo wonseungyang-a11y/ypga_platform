@@ -17,6 +17,8 @@ type Props = {
   rowCounts: RowCounts | null;
   hasPdfDocuments: boolean;
   supabaseOk: boolean;
+  /** 서비스 롤 URL·키가 갖춰졌는지(AI 분석 전용) */
+  serviceEnvOk: boolean;
 };
 
 const PLACEHOLDER = "질문을 입력하세요";
@@ -27,6 +29,7 @@ export function AskDataClient({
   rowCounts,
   hasPdfDocuments,
   supabaseOk,
+  serviceEnvOk,
 }: Props) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<string | null>(null);
@@ -115,23 +118,57 @@ export function AskDataClient({
           className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
           role="status"
         >
-          {!supabaseOk ? (
+          {!serviceEnvOk ? (
+            <>
+              <p className="font-semibold">Supabase(AI 분석용) 환경 변수가 없습니다</p>
+              <p className="mt-2">
+                AI 분석은 <strong>서버 전용</strong> 연결이 필요합니다. Vercel
+                Project Settings → Environment Variables에 아래를 추가한 뒤{" "}
+                <strong>재배포</strong>하세요.
+              </p>
+              <ul className="mt-3 list-inside list-disc space-y-1.5 text-xs sm:text-sm">
+                <li>
+                  <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                    SUPABASE_SERVICE_ROLE_KEY
+                  </code>{" "}
+                  (Supabase 대시보드 → Project Settings → API → service_role)
+                </li>
+                <li>
+                  API URL 하나:{" "}
+                  <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                    NEXT_PUBLIC_SUPABASE_URL
+                  </code>{" "}
+                  또는 서버 전용{" "}
+                  <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
+                    SUPABASE_URL
+                  </code>
+                  — 값은{" "}
+                  <code className="text-xs">https://xxxx.supabase.co</code> 처럼{" "}
+                  <strong>경로 없이</strong> 프로젝트 URL만 넣어야 합니다.
+                </li>
+              </ul>
+              <p className="mt-3 text-xs opacity-90">
+                참고: 회원·대회 페이지는{" "}
+                <code className="rounded bg-amber-100/80 px-1 dark:bg-amber-900/60">
+                  NEXT_PUBLIC_SUPABASE_ANON_KEY
+                </code>
+                가 있으면 Supabase를 쓰고, AI 분석은 반드시 service role이
+                필요합니다.
+              </p>
+            </>
+          ) : !supabaseOk ? (
             <>
               <p className="font-semibold">Supabase에 연결할 수 없습니다</p>
               <p className="mt-2">
-                배포(Vercel) 환경 변수에{" "}
+                환경 변수는 있으나 테이블 조회에 실패했습니다.{" "}
                 <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
                   SUPABASE_SERVICE_ROLE_KEY
                 </code>
-                와{" "}
+                가 올바른지, 마이그레이션{" "}
                 <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
-                  SUPABASE_URL
-                </code>{" "}
-                (또는{" "}
-                <code className="rounded bg-amber-100 px-1 dark:bg-amber-900/80">
-                  NEXT_PUBLIC_SUPABASE_URL
-                </code>{" "}
-                )을 확인하세요.
+                  003_ypga_data_tables.sql
+                </code>
+                적용 여부·프로젝트 일치를 확인하세요.
               </p>
             </>
           ) : (

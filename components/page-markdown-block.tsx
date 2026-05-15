@@ -4,7 +4,7 @@ import { MARKDOWN_PROSE_CLASS } from "@/lib/markdown-prose-class";
 import { getPageMarkdown } from "@/lib/page-content";
 
 const mdBoxWrap =
-  "mb-6 rounded-xl border border-yonsei/15 bg-yonsei/5 px-4 py-4 dark:border-yonsei/30 dark:bg-yonsei/10 ";
+  "mb-6 rounded-2xl border border-border bg-card/70 px-5 py-4 shadow-sm ring-1 ring-yonsei/10 backdrop-blur-sm dark:ring-yonsei/15";
 
 type Props = {
   path: string;

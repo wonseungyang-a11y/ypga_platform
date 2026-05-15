@@ -33,14 +33,14 @@ export default async function ParticipantsPage() {
           조편성 기록
         </h1>
         <PageMarkdownBlock path="/participants" className="mt-4" />
-        <p className="mt-3 text-zinc-600 dark:text-zinc-400">
+        <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
           정기·스크린 총회 등 행사별 조 편성을 보고, 이름으로 검색하면 해당
           인원이 속한 조 전원이 함께 표시됩니다.
         </p>
         <p className="mt-4">
           <Link
             href="/"
-            className="text-sm font-medium text-yonsei underline dark:text-yonsei-200"
+            className="text-sm font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
           >
             홈으로
           </Link>
