@@ -75,7 +75,12 @@ async function syncSiteMenuFromDisk(
     },
     { onConflict: "id" },
   );
-  if (error) throw new Error(`site_menu upsert: ${error.message}`);
+  if (error) {
+    console.warn(
+      `site_menu upsert 생략: ${error.message} (001_site_menu.sql 적용 필요)`,
+    );
+    return;
+  }
   console.log(`site_menu: ${items.length}개 항목`);
 }
 
@@ -113,7 +118,10 @@ async function syncPageContentsFromDisk(
       { onConflict: "path" },
     );
     if (error) {
-      throw new Error(`site_page_content upsert ${pathNorm}: ${error.message}`);
+      console.warn(
+        `site_page_content upsert ${pathNorm} 생략: ${error.message}`,
+      );
+      continue;
     }
     n += 1;
   }

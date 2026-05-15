@@ -5,22 +5,37 @@ import type { ParticipantRow } from "./participants-types";
 export type { ParticipantRow } from "./participants-types";
 export { rowEventKey } from "./participants-types";
 
-/** 헤더: 구분,대회,일자,장소,조,이름 */
+/**
+ * 지원 형식
+ * - 6열: 구분,대회,일자,장소,조,이름 (연번·대회명 분리)
+ * - 5열: 구분(실제로는 대회명),일자,장소,조,이름
+ */
 function parseLine(line: string): ParticipantRow | null {
   const t = line.trim();
   if (!t) return null;
-  const cols = t.split(",");
-  if (cols.length < 6) return null;
+  const cols = t.split(",").map((c) => c.trim());
+  if (cols.length < 5) return null;
 
-  const name = (cols[cols.length - 1] ?? "").trim();
-  const g = parseInt((cols[cols.length - 2] ?? "").trim(), 10);
+  const name = cols[cols.length - 1] ?? "";
+  const g = parseInt(cols[cols.length - 2] ?? "", 10);
   if (!name || !Number.isFinite(g)) return null;
 
+  if (cols.length >= 6) {
+    return {
+      seqNo: cols[0] ?? "",
+      eventLabel: cols[1] ?? "",
+      date: cols[2] ?? "",
+      venue: cols[3] ?? "",
+      groupNo: g,
+      name,
+    };
+  }
+
   return {
-    seqNo: (cols[0] ?? "").trim(),
-    eventLabel: (cols[1] ?? "").trim(),
-    date: (cols[2] ?? "").trim(),
-    venue: (cols[3] ?? "").trim(),
+    seqNo: "",
+    eventLabel: cols[0] ?? "",
+    date: cols[1] ?? "",
+    venue: cols[2] ?? "",
     groupNo: g,
     name,
   };
