@@ -5,26 +5,24 @@ import type { ParticipantRow } from "./participants-types";
 export type { ParticipantRow } from "./participants-types";
 export { rowEventKey } from "./participants-types";
 
+/** 헤더: 구분,대회,일자,장소,조,이름 */
 function parseLine(line: string): ParticipantRow | null {
   const t = line.trim();
   if (!t) return null;
   const cols = t.split(",");
-  if (cols.length < 5) return null;
+  if (cols.length < 6) return null;
 
-  const last = cols[cols.length - 1]?.trim() ?? "";
-  const gRaw = cols[cols.length - 2]?.trim() ?? "";
-  const g = parseInt(gRaw, 10);
-  if (!Number.isFinite(g)) return null;
+  const name = (cols[cols.length - 1] ?? "").trim();
+  const g = parseInt((cols[cols.length - 2] ?? "").trim(), 10);
+  if (!name || !Number.isFinite(g)) return null;
 
-  const eventLabel = cols[0]?.trim() ?? "";
-  const date = cols[1]?.trim() ?? "";
-  const venue = cols.slice(2, cols.length - 2).join(",").trim();
   return {
-    eventLabel,
-    date,
-    venue,
+    seqNo: (cols[0] ?? "").trim(),
+    eventLabel: (cols[1] ?? "").trim(),
+    date: (cols[2] ?? "").trim(),
+    venue: (cols[3] ?? "").trim(),
     groupNo: g,
-    name: last,
+    name,
   };
 }
 

@@ -1,4 +1,10 @@
+import { loadYpgaDataForAsk, type AskYpgaData } from "./ask-ypga-data";
+import {
+  buildIntegrationFactsMarkdown,
+  buildMembersParticipantsIntegration,
+} from "./members-participants-integration";
 import type { ParsedQuery } from "./qa-parse";
+import { normalizeYpgaMemberRow } from "./ypga-member-row";
 import { probeSupabaseRestHead } from "./supabase/https-probe";
 import {
   createSupabaseServiceClient,
@@ -49,6 +55,16 @@ function buildRowCountHints(summary: string): readonly string[] {
   ) {
     hints.push(
       "`ypga_members`, `ypga_participants`, `ypga_tournaments` 테이블이 없습니다. Supabase Dashboard → SQL Editor에서 이 저장소의 `supabase/migrations/003_ypga_data_tables.sql`을 해당 프로젝트에 실행했는지 확인하세요.",
+    );
+  }
+
+  if (
+    s.includes('column "winner" does not exist') ||
+    s.includes("column \"name\" does not exist") ||
+    (s.includes("column") && s.includes("does not exist"))
+  ) {
+    hints.push(
+      "컬럼명이 한글·혼합 스키마이면 RPC가 실패할 수 있습니다. SQL Editor에서 `supabase/migrations/007_rebuild_ypga_tables.sql` 실행 후 `npm run sync:db` 하세요.",
     );
   }
 
@@ -169,21 +185,9 @@ export async function getYpgaDataRowCountsOutcome(): Promise<YpgaDataRowCountsOu
   };
 }
 
-/** 서비스 키 없음·조회 실패 시 null */
-export async function getYpgaDataRowCounts(): Promise<YpgaRowCounts | null> {
-  const r = await getYpgaDataRowCountsOutcome();
-  return r.ok ? r.counts : null;
-}
-
-/** @deprecated 호환용 — 대회 행 수만 필요할 때 */
-export async function getTournamentsRowCount(): Promise<number> {
-  const c = await getYpgaDataRowCounts();
-  if (!c) return -1;
-  return c.tournaments;
-}
-
 export async function runDataQuery(
   parsed: ParsedQuery,
+  ypgaData?: AskYpgaData,
 ): Promise<{ markdown: string } | { error: string }> {
   const supabase = createSupabaseServiceClient();
   if (!supabase) {
@@ -197,13 +201,24 @@ export async function runDataQuery(
     return { markdown: `### 안내\n\n${parsed.hint}` };
   }
 
+  if (parsed.kind === "integrated_analysis") {
+    const data = ypgaData ?? (await loadYpgaDataForAsk());
+    const integration = buildMembersParticipantsIntegration(
+      data.members,
+      data.participants,
+    );
+    const facts = buildIntegrationFactsMarkdown(integration, data.source);
+    const note = data.loadNote ? `\n\n*(${data.loadNote})*` : "";
+    return { markdown: facts + note };
+  }
+
   if (parsed.kind === "winner_count") {
     const { data, error } = await supabase.rpc("fn_winner_count", {
       p_name: parsed.name,
     });
     if (error) {
       return {
-        error: `우승 횟수 조회 실패: ${error.message}. 마이그레이션(003) 적용·sync:db 여부를 확인하세요.`,
+        error: `우승 횟수 조회 실패: ${error.message}. 003 마이그레이션·sync:db 여부를 확인하세요. 스키마가 깨졌다면 007_rebuild_ypga_tables.sql 후 npm run sync:db.`,
       };
     }
     const n = typeof data === "number" ? data : Number(data);
@@ -221,7 +236,7 @@ export async function runDataQuery(
     });
     if (error) {
       return {
-        error: `조편성 조회 실패: ${error.message}. 마이그레이션(003) 적용·sync:db 여부를 확인하세요.`,
+        error: `조편성 조회 실패: ${error.message}. 003·sync:db 확인. 한글/혼합 스키마면 007_rebuild_ypga_tables.sql 실행.`,
       };
     }
     const n = typeof data === "number" ? data : Number(data);
@@ -236,30 +251,35 @@ export async function runDataQuery(
   if (parsed.kind === "member_lookup") {
     const { data, error } = await supabase
       .from("ypga_members")
-      .select(
-        "category, serial_no, cohort, name, nickname_ko, nickname_en, residence",
-      )
+      .select("*")
       .eq("name", parsed.name)
       .limit(10);
     if (error) {
-      return { error: `회원 조회 실패: ${error.message}` };
+      return {
+        error: `회원 조회 실패: ${error.message}. 스키마 문제 시 007_rebuild_ypga_tables.sql 실행.`,
+      };
     }
     if (!data?.length) {
       return {
         markdown: `### 회원 명단\n\n**${parsed.name}** 이름과 일치하는 행이 \`ypga_members\`에 없습니다. (동기화·철자 확인)`,
       };
     }
-    const rows = data
+    const rows = data.map((raw) => normalizeYpgaMemberRow(raw));
+    const lines = rows
       .map(
         (r) =>
-          `| ${r.category ?? ""} | ${r.cohort ?? ""} | ${r.name ?? ""} | ${r.nickname_ko ?? ""} | ${r.residence ?? ""} |`,
+          `| ${r.category} | ${r.cohort} | ${r.name} | ${r.nickname_ko} | ${r.nickname_en} | ${r.residence} |`,
       )
       .join("\n");
+    const nickLine = rows[0]
+      ? `**한글 닉네임**: ${rows[0].nickname_ko || "(없음)"} · **영문 닉네임**: ${rows[0].nickname_en || "(없음)"}\n\n`
+      : "";
     return {
       markdown:
         `### ${parsed.name} 회원 정보\n\n` +
-        `| 구분 | 기수 | 성명 | 닉네임 | 거주지 |\n| --- | --- | --- | --- | --- |\n` +
-        rows,
+        nickLine +
+        `| 구분 | 기수 | 성명 | 닉네임(한) | 닉네임(영) | 거주지 |\n| --- | --- | --- | --- | --- | --- |\n` +
+        lines,
     };
   }
 

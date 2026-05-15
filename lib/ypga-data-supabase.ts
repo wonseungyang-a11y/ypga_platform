@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "./supabase/server";
+import { fetchAllRowsFromTable } from "./ypga-supabase-fetch";
 import type { MemberCsvRow } from "./members-csv";
 import type { ParticipantRow } from "./participants-types";
 import type { TournamentRow } from "./tournaments-types";
@@ -53,6 +54,7 @@ function mapParticipant(r: ParticipantRowDb): ParticipantRow {
       ? ""
       : String(r.event_date).slice(0, 10);
   return {
+    seqNo: "",
     eventLabel: r.event_title ?? "",
     date,
     venue: r.location ?? "",
@@ -83,37 +85,28 @@ function mapTournament(r: TournamentRowDb): TournamentRow {
   };
 }
 
-async function fetchAllRows<T>(table: string): Promise<T[]> {
-  const supabase = await createSupabaseServerClient();
-  const pageSize = 1000;
-  const out: T[] = [];
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await supabase
-      .from(table)
-      .select("*")
-      .order("id", { ascending: true })
-      .range(from, from + pageSize - 1);
-    if (error) throw error;
-    const rows = (data ?? []) as T[];
-    out.push(...rows);
-    if (rows.length < pageSize) break;
-  }
-  return out;
-}
-
 export async function fetchMembersFromSupabase(): Promise<MemberCsvRow[]> {
-  const rows = await fetchAllRows<MemberRowDb>("ypga_members");
+  const supabase = await createSupabaseServerClient();
+  const rows = await fetchAllRowsFromTable<MemberRowDb>(supabase, "ypga_members");
   return rows.map(mapMember);
 }
 
 export async function fetchParticipantsFromSupabase(): Promise<
   ParticipantRow[]
 > {
-  const rows = await fetchAllRows<ParticipantRowDb>("ypga_participants");
+  const supabase = await createSupabaseServerClient();
+  const rows = await fetchAllRowsFromTable<ParticipantRowDb>(
+    supabase,
+    "ypga_participants",
+  );
   return rows.map(mapParticipant);
 }
 
 export async function fetchTournamentsFromSupabase(): Promise<TournamentRow[]> {
-  const rows = await fetchAllRows<TournamentRowDb>("ypga_tournaments");
+  const supabase = await createSupabaseServerClient();
+  const rows = await fetchAllRowsFromTable<TournamentRowDb>(
+    supabase,
+    "ypga_tournaments",
+  );
   return rows.map(mapTournament);
 }

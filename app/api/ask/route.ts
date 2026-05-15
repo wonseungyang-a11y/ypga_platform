@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { hasPublicPdfDocuments } from "@/lib/ask-resources-text";
+import { loadYpgaDataForAsk } from "@/lib/ask-ypga-data";
 import { buildGeminiDataBundle } from "@/lib/ask-gemini-context";
 import { analyzeWithGemini, isGeminiConfigured } from "@/lib/gemini";
 import { parseDataQuestion } from "@/lib/qa-parse";
@@ -76,7 +77,8 @@ export async function POST(request: Request) {
   }
 
   const parsed = parseDataQuestion(question);
-  const result = await runDataQuery(parsed);
+  const ypgaData = await loadYpgaDataForAsk();
+  const result = await runDataQuery(parsed, ypgaData);
 
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: 502 });
@@ -86,6 +88,7 @@ export async function POST(request: Request) {
     question,
     parsed,
     result.markdown,
+    ypgaData,
   );
 
   const gemini = await analyzeWithGemini(question, dbPayload);

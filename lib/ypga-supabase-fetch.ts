@@ -8,11 +8,17 @@ export async function fetchAllRowsFromTable<T extends Record<string, unknown>>(
   const pageSize = 1000;
   const out: T[] = [];
   for (let from = 0; ; from += pageSize) {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from(table)
       .select("*")
       .order("id", { ascending: true })
       .range(from, from + pageSize - 1);
+    if (error && /column.*\bid\b/i.test(error.message)) {
+      ({ data, error } = await supabase
+        .from(table)
+        .select("*")
+        .range(from, from + pageSize - 1));
+    }
     if (error) throw error;
     const rows = (data ?? []) as T[];
     out.push(...rows);
