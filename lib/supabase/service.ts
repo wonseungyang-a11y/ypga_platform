@@ -12,6 +12,11 @@ function normalizeSupabaseApiOrigin(urlStr: string): string {
   return u.origin;
 }
 
+/** 서비스 롤 클라이언트에 쓰는 API Origin (`https://xxxx.supabase.co`) — 없으면 null */
+export function getConfiguredSupabaseServiceOrigin(): string | null {
+  return serviceSupabaseUrl();
+}
+
 function serviceSupabaseUrl(): string | null {
   const raw =
     process.env.SUPABASE_URL?.replace(/\u00a0/g, " ").trim() ||

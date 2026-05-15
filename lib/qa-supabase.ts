@@ -1,5 +1,9 @@
 import type { ParsedQuery } from "./qa-parse";
-import { createSupabaseServiceClient } from "./supabase/service";
+import { probeSupabaseRestHead } from "./supabase/https-probe";
+import {
+  createSupabaseServiceClient,
+  getConfiguredSupabaseServiceOrigin,
+} from "./supabase/service";
 
 export type YpgaRowCounts = {
   members: number;
@@ -78,6 +82,26 @@ function buildRowCountHints(summary: string): readonly string[] {
   return hints;
 }
 
+async function augmentHintsWhenFetchFailed(
+  summary: string,
+  hints: readonly string[],
+): Promise<readonly string[]> {
+  if (!summary.toLowerCase().includes("fetch failed")) return hints;
+  const origin = getConfiguredSupabaseServiceOrigin();
+  const out = [...hints];
+  if (origin) {
+    try {
+      out.push(await probeSupabaseRestHead(origin));
+    } catch {
+      out.push("연결 프로브 실행 중 오류가 발생했습니다.");
+    }
+  }
+  out.push(
+    "Vercel에는 **서버 전용** `SUPABASE_URL`에도 Supabase **Project URL**을 동일하게 넣는 것을 권장합니다. `NEXT_PUBLIC_SUPABASE_URL`만 사용할 때 빌드/배포 타이밍에 따라 런타임 값이 기대와 달라질 수 있습니다. 저장 후 **Redeploy** 하세요.",
+  );
+  return out;
+}
+
 /** 행 수 조회 결과(실패 시 PostgREST 요약 포함) */
 export async function getYpgaDataRowCountsOutcome(): Promise<YpgaDataRowCountsOutcome> {
   const supabase = createSupabaseServiceClient();
@@ -112,7 +136,10 @@ export async function getYpgaDataRowCountsOutcome(): Promise<YpgaDataRowCountsOu
       ok: false,
       kind: "query_failed",
       summary,
-      hints: buildRowCountHints(summary),
+      hints: await augmentHintsWhenFetchFailed(
+        summary,
+        buildRowCountHints(summary),
+      ),
     };
   }
 
@@ -125,7 +152,10 @@ export async function getYpgaDataRowCountsOutcome(): Promise<YpgaDataRowCountsOu
       ok: false,
       kind: "query_failed",
       summary,
-      hints: buildRowCountHints(summary),
+      hints: await augmentHintsWhenFetchFailed(
+        summary,
+        buildRowCountHints(summary),
+      ),
     };
   }
 
