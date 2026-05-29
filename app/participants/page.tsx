@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   description: "정기총회·스크린총회 조편성 기록",
 };
 
+/** CSV→Supabase 동기화 직후에도 최신 조편성이 보이도록 캐시 비활성 */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ParticipantsPage() {
   let rows: Awaited<ReturnType<typeof getSiteParticipants>> = [];
   let error: string | null = null;
