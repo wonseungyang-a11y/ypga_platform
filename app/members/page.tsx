@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: "YPGA 회원 명단",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function MembersPage() {
   let members: Awaited<ReturnType<typeof getSiteMembers>> = [];
   let error: string | null = null;

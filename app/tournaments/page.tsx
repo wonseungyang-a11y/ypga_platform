@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: "정기총회·스크린총회 대회 기록",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TournamentsPage() {
   let rows: Awaited<ReturnType<typeof getSiteTournaments>> = [];
   let error: string | null = null;
