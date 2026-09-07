@@ -1,8 +1,36 @@
 import Link from "next/link";
 import { PageMarkdownBlock } from "@/components/page-markdown-block";
+import { getHomeLiveCounts } from "@/lib/home-live-counts";
 import { HOME_FEATURE_CARDS } from "@/lib/site-menu";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function cardDesc(
+  href: string,
+  base: string,
+  counts: Awaited<ReturnType<typeof getHomeLiveCounts>>,
+): string {
+  if (counts.source !== "supabase") return base;
+  if (href === "/members") return `${base} · ${counts.members}명`;
+  if (href === "/tournaments") return `${base} · ${counts.tournaments}건`;
+  if (href === "/participants") return `${base} · ${counts.participants}건`;
+  return base;
+}
+
+export default async function Home() {
+  let counts: Awaited<ReturnType<typeof getHomeLiveCounts>> = {
+    members: 0,
+    tournaments: 0,
+    participants: 0,
+    source: "unavailable",
+  };
+  try {
+    counts = await getHomeLiveCounts();
+  } catch {
+    /* 카드 문구만 기본값 유지 */
+  }
+
   return (
     <div className="relative overflow-hidden">
       <div
@@ -43,7 +71,7 @@ export default function Home() {
                   {s.title}
                 </h2>
                 <p className="mt-2 pl-2 text-sm leading-relaxed text-zinc-700/85 dark:text-zinc-300/75">
-                  {s.desc}
+                  {cardDesc(s.href, s.desc, counts)}
                 </p>
                 <span className="mt-5 inline-block pl-2 text-sm font-semibold text-yonsei transition group-hover:text-yonsei-600 dark:text-yonsei-200 dark:group-hover:text-yonsei-100">
                   이동 →
