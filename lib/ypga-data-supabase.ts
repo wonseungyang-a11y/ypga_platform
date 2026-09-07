@@ -1,8 +1,14 @@
 import { createSupabaseServerClient } from "./supabase/server";
+import {
+  createSupabaseServiceClient,
+  isSupabaseServiceConfigured,
+} from "./supabase/service";
+import { isSupabaseConfigured } from "./admin";
 import { fetchAllRowsFromTable } from "./ypga-supabase-fetch";
 import type { MemberCsvRow } from "./members-csv";
 import type { ParticipantRow } from "./participants-types";
 import type { TournamentRow } from "./tournaments-types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type MemberRowDb = {
   category: string | null;
@@ -85,8 +91,29 @@ function mapTournament(r: TournamentRowDb): TournamentRow {
   };
 }
 
+/**
+ * 공개 페이지 서버 조회: Ask API와 같이 SERVICE_ROLE 우선.
+ * (Vercel에 anon 키가 없거나 SSR 클라이언트가 실패해도 CSV로 조용히 떨어지지 않게)
+ */
+async function getYpgaReadClient(): Promise<SupabaseClient> {
+  const service = createSupabaseServiceClient();
+  if (service) return service;
+
+  if (isSupabaseConfigured()) {
+    return createSupabaseServerClient();
+  }
+
+  throw new Error(
+    "Supabase가 설정되지 않았습니다. SUPABASE_SERVICE_ROLE_KEY 와 NEXT_PUBLIC_SUPABASE_URL(또는 SUPABASE_URL)을 확인하세요.",
+  );
+}
+
+export function isYpgaSupabaseReadable(): boolean {
+  return isSupabaseServiceConfigured() || isSupabaseConfigured();
+}
+
 export async function fetchMembersFromSupabase(): Promise<MemberCsvRow[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await getYpgaReadClient();
   const rows = await fetchAllRowsFromTable<MemberRowDb>(supabase, "ypga_members");
   return rows.map(mapMember);
 }
@@ -94,7 +121,7 @@ export async function fetchMembersFromSupabase(): Promise<MemberCsvRow[]> {
 export async function fetchParticipantsFromSupabase(): Promise<
   ParticipantRow[]
 > {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await getYpgaReadClient();
   const rows = await fetchAllRowsFromTable<ParticipantRowDb>(
     supabase,
     "ypga_participants",
@@ -103,7 +130,7 @@ export async function fetchParticipantsFromSupabase(): Promise<
 }
 
 export async function fetchTournamentsFromSupabase(): Promise<TournamentRow[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await getYpgaReadClient();
   const rows = await fetchAllRowsFromTable<TournamentRowDb>(
     supabase,
     "ypga_tournaments",

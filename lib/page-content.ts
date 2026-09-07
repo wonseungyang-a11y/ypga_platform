@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { isSupabaseConfigured } from "./admin";
 import { createSupabaseServerClient } from "./supabase/server";
+import { createSupabaseServiceClient } from "./supabase/service";
 
 type FileShape = Record<string, string>;
 
@@ -36,9 +37,10 @@ function readFileStore(): FileShape {
 export async function getPageMarkdown(path: string): Promise<string | null> {
   try {
     const key = normalizeContentPath(path);
-    if (isSupabaseConfigured()) {
+    const service = createSupabaseServiceClient();
+    if (service || isSupabaseConfigured()) {
       try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = service ?? (await createSupabaseServerClient());
         const { data, error } = await supabase
           .from("site_page_content")
           .select("body_md")

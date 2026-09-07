@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { createSupabaseServerClient } from "./supabase/server";
 import { isSupabaseConfigured } from "./admin";
+import { createSupabaseServiceClient } from "./supabase/service";
 
 export type SiteMenuLink = {
   href: string;
@@ -102,9 +103,10 @@ function readMenuFromFile(): SiteMenuLink[] {
 
 export async function getSiteMenuItems(): Promise<SiteMenuLink[]> {
   try {
-    if (isSupabaseConfigured()) {
+    const service = createSupabaseServiceClient();
+    if (service || isSupabaseConfigured()) {
       try {
-        const supabase = await createSupabaseServerClient();
+        const supabase = service ?? (await createSupabaseServerClient());
         const { data, error } = await supabase
           .from("site_menu")
           .select("items")
