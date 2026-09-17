@@ -3,6 +3,11 @@
 import { useMemo, useState } from "react";
 import { SiteSearchInput } from "@/components/site-search-input";
 import type { MemberStatRow } from "@/lib/member-stats";
+import {
+  compareCohortThenSerial,
+  cohortValue,
+  serialNoValue,
+} from "@/lib/member-stats";
 import { matchesSearchText } from "@/lib/search-text";
 
 type SortKey =
@@ -26,9 +31,7 @@ function compareRows(a: MemberStatRow, b: MemberStatRow, key: SortKey): number {
     return (a[key] as number) - (b[key] as number);
   }
   if (key === "cohort") {
-    const na = parseInt(a.cohort, 10);
-    const nb = parseInt(b.cohort, 10);
-    if (Number.isFinite(na) && Number.isFinite(nb) && na !== nb) return na - nb;
+    return cohortValue(a.cohort) - cohortValue(b.cohort);
   }
   return String(a[key]).localeCompare(String(b[key]), "ko");
 }
@@ -123,9 +126,16 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
         })
       : rows;
     const sorted = [...list].sort((a, b) => {
+      if (sortKey === "cohort") {
+        const cohortCmp = cohortValue(a.cohort) - cohortValue(b.cohort);
+        if (cohortCmp !== 0) {
+          return sortDir === "asc" ? cohortCmp : -cohortCmp;
+        }
+        return serialNoValue(a.serialNo) - serialNoValue(b.serialNo);
+      }
       const c = compareRows(a, b, sortKey);
       if (c !== 0) return sortDir === "asc" ? c : -c;
-      return a.name.localeCompare(b.name, "ko");
+      return compareCohortThenSerial(a, b);
     });
     return sorted;
   }, [rows, q, sortKey, sortDir]);
@@ -231,7 +241,7 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
             ) : (
               filtered.map((r) => (
                 <tr
-                  key={`${r.name}-${r.cohort}`}
+                  key={`${r.serialNo}-${r.name}-${r.cohort}`}
                   className="border-b border-zinc-100 odd:bg-white even:bg-zinc-50/80 dark:border-zinc-800 dark:odd:bg-zinc-950 dark:even:bg-zinc-900/50"
                 >
                   <td className="px-3 py-2 whitespace-nowrap tabular-nums">

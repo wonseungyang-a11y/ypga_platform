@@ -5,6 +5,7 @@ import type { TournamentRow } from "./tournaments-types";
 
 export type MemberStatRow = {
   name: string;
+  serialNo: string;
   cohort: string;
   category: string;
   nicknameKo: string;
@@ -80,6 +81,30 @@ export function isRegularParticipantEvent(p: ParticipantRow): boolean {
   return label.includes("정기");
 }
 
+export function serialNoValue(serialNo: string): number {
+  const n = parseInt(String(serialNo ?? "").trim(), 10);
+  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+}
+
+export function cohortValue(cohort: string): number {
+  const n = parseInt(String(cohort ?? "").trim(), 10);
+  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+}
+
+/** 기수 오름차순 → 회원 번호 오름차순 */
+export function compareCohortThenSerial(
+  a: MemberStatRow,
+  b: MemberStatRow,
+): number {
+  const ca = cohortValue(a.cohort);
+  const cb = cohortValue(b.cohort);
+  if (ca !== cb) return ca - cb;
+  const sa = serialNoValue(a.serialNo);
+  const sb = serialNoValue(b.serialNo);
+  if (sa !== sb) return sa - sb;
+  return a.name.localeCompare(b.name, "ko");
+}
+
 export function buildMemberStats(
   members: MemberCsvRow[],
   participants: ParticipantRow[],
@@ -114,6 +139,7 @@ export function buildMemberStats(
       const name = m.name.trim();
       return {
         name,
+        serialNo: m.serialNo.trim(),
         cohort: m.cohort,
         category: m.category,
         nicknameKo: m.nicknameKo.trim(),
@@ -124,12 +150,5 @@ export function buildMemberStats(
         holeInOnes: holeInOnes.get(name) ?? 0,
       };
     })
-    .sort((a, b) => {
-      const na = parseInt(a.cohort, 10);
-      const nb = parseInt(b.cohort, 10);
-      const ca = Number.isFinite(na) ? na : Number.MAX_SAFE_INTEGER;
-      const cb = Number.isFinite(nb) ? nb : Number.MAX_SAFE_INTEGER;
-      if (ca !== cb) return ca - cb;
-      return a.name.localeCompare(b.name, "ko");
-    });
+    .sort(compareCohortThenSerial);
 }
