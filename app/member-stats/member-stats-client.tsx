@@ -33,6 +33,32 @@ function compareRows(a: MemberStatRow, b: MemberStatRow, key: SortKey): number {
   return String(a[key]).localeCompare(String(b[key]), "ko");
 }
 
+function SortIcon({ active, dir }: { active: boolean; dir: "asc" | "desc" }) {
+  return (
+    <span
+      className="inline-flex flex-col text-[0.55rem] leading-[0.7]"
+      aria-hidden
+    >
+      <span
+        className={
+          active && dir === "asc" ? "text-yonsei" : "text-zinc-300 dark:text-zinc-600"
+        }
+      >
+        ▲
+      </span>
+      <span
+        className={
+          active && dir === "desc"
+            ? "text-yonsei"
+            : "text-zinc-300 dark:text-zinc-600"
+        }
+      >
+        ▼
+      </span>
+    </span>
+  );
+}
+
 function SortHeader({
   label,
   sortKey,
@@ -51,20 +77,22 @@ function SortHeader({
   const active = activeKey === sortKey;
   return (
     <th
-      className={`px-3 py-2 font-semibold whitespace-nowrap ${
+      className={`p-0 font-semibold whitespace-nowrap ${
         align === "right" ? "text-right" : "text-left"
       }`}
+      aria-sort={
+        active ? (dir === "asc" ? "ascending" : "descending") : "none"
+      }
     >
       <button
         type="button"
         onClick={() => onClick(sortKey)}
-        className="inline-flex items-center gap-1 rounded-md text-inherit outline-none ring-yonsei/0 transition hover:text-yonsei focus-visible:ring-2 focus-visible:ring-yonsei/40"
-        aria-pressed={active}
+        className={`inline-flex w-full cursor-pointer items-center gap-1 px-3 py-2 text-inherit outline-none ring-yonsei/0 transition hover:bg-zinc-200/70 hover:text-yonsei focus-visible:ring-2 focus-visible:ring-yonsei/40 dark:hover:bg-zinc-800 ${
+          align === "right" ? "justify-end" : "justify-start"
+        } ${active ? "text-yonsei" : ""}`}
       >
         {label}
-        <span className="text-xs text-zinc-400" aria-hidden>
-          {active ? (dir === "asc" ? "▲" : "▼") : ""}
-        </span>
+        <SortIcon active={active} dir={dir} />
       </button>
     </th>
   );
@@ -84,8 +112,8 @@ function StatCell({ value }: { value: number }) {
 
 export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
   const [q, setQ] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("participationCount");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [sortKey, setSortKey] = useState<SortKey>("cohort");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const filtered = useMemo(() => {
     const list = q.trim()

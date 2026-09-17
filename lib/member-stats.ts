@@ -125,11 +125,11 @@ export function buildMemberStats(
       };
     })
     .sort((a, b) => {
-      if (b.participationCount !== a.participationCount) {
-        return b.participationCount - a.participationCount;
-      }
-      if (b.wins !== a.wins) return b.wins - a.wins;
-      if (b.medalists !== a.medalists) return b.medalists - a.medalists;
+      const na = parseInt(a.cohort, 10);
+      const nb = parseInt(b.cohort, 10);
+      const ca = Number.isFinite(na) ? na : Number.MAX_SAFE_INTEGER;
+      const cb = Number.isFinite(nb) ? nb : Number.MAX_SAFE_INTEGER;
+      if (ca !== cb) return ca - cb;
       return a.name.localeCompare(b.name, "ko");
     });
 }
