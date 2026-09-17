@@ -67,6 +67,19 @@ function addMap(target: Map<string, number>, source: Map<string, number>): void 
   }
 }
 
+/** 정기총회만 포함. 스크린 총회는 제외 */
+export function isRegularTournament(t: TournamentRow): boolean {
+  const type = (t.type ?? "").trim();
+  if (type.includes("스크린")) return false;
+  return type.includes("정기");
+}
+
+export function isRegularParticipantEvent(p: ParticipantRow): boolean {
+  const label = (p.eventLabel ?? "").trim();
+  if (label.includes("스크린")) return false;
+  return label.includes("정기");
+}
+
 export function buildMemberStats(
   members: MemberCsvRow[],
   participants: ParticipantRow[],
@@ -74,6 +87,7 @@ export function buildMemberStats(
 ): MemberStatRow[] {
   const participation = new Map<string, Set<string>>();
   for (const p of participants) {
+    if (!isRegularParticipantEvent(p)) continue;
     const name = p.name.trim();
     if (!name) continue;
     const events = participation.get(name) ?? new Set<string>();
@@ -87,6 +101,7 @@ export function buildMemberStats(
   const holeInOnes = new Map<string, number>();
 
   for (const t of tournaments) {
+    if (!isRegularTournament(t)) continue;
     countNamesInField(t.winner, wins);
     countNamesInField(t.medalist, medalists);
     addMap(eagles, countNoteAwards(t.notes, "이글"));

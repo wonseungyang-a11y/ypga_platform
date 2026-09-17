@@ -11,7 +11,7 @@ import { MemberStatsClient } from "./member-stats-client";
 
 export const metadata: Metadata = {
   title: "회원별 통계 | YPGA",
-  description: "회원별 참가횟수·우승·메달리스트·이글·홀인원",
+  description: "정기총회 기준 회원별 참가횟수·우승·메달리스트·홀인원·이글",
 };
 
 export const dynamic = "force-dynamic";
@@ -40,9 +40,11 @@ export default async function MemberStatsPage() {
         </h1>
         <PageMarkdownBlock path="/member-stats" className="mt-4" />
         <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
-          조편성·대회 기록을 바탕으로 회원별 참가횟수, 우승, 메달리스트, 이글,
-          홀인원 횟수를 표로 확인합니다. 공동 우승·공동 메달리스트는 각각 1회로
-          집계합니다.
+          정기총회 조편성·대회 기록만 집계합니다. 스크린 총회는 포함하지
+          않습니다. 공동 우승·공동 메달리스트는 각각 1회로 집계합니다.
+        </p>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+          기록 누락이나 표기 차이 등으로 통계에 오류가 있을 수 있습니다.
         </p>
         <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
           <Link

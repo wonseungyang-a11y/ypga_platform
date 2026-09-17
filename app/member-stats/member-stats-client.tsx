@@ -6,13 +6,12 @@ import type { MemberStatRow } from "@/lib/member-stats";
 import { matchesSearchText } from "@/lib/search-text";
 
 type SortKey =
-  | "name"
   | "cohort"
   | "participationCount"
   | "wins"
   | "medalists"
-  | "eagles"
-  | "holeInOnes";
+  | "holeInOnes"
+  | "eagles";
 
 const NUMERIC_KEYS = new Set<SortKey>([
   "participationCount",
@@ -141,19 +140,15 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
           <thead>
             <tr className="border-b border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
               <SortHeader
-                label="성명"
-                sortKey="name"
-                activeKey={sortKey}
-                dir={sortDir}
-                onClick={toggleSort}
-              />
-              <SortHeader
                 label="기수"
                 sortKey="cohort"
                 activeKey={sortKey}
                 dir={sortDir}
                 onClick={toggleSort}
               />
+              <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">
+                성명
+              </th>
               <SortHeader
                 label="참가횟수"
                 sortKey="participationCount"
@@ -179,16 +174,16 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
                 onClick={toggleSort}
               />
               <SortHeader
-                label="이글"
-                sortKey="eagles"
+                label="홀인원"
+                sortKey="holeInOnes"
                 activeKey={sortKey}
                 dir={sortDir}
                 align="right"
                 onClick={toggleSort}
               />
               <SortHeader
-                label="홀인원"
-                sortKey="holeInOnes"
+                label="이글"
+                sortKey="eagles"
                 activeKey={sortKey}
                 dir={sortDir}
                 align="right"
@@ -211,6 +206,9 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
                   key={`${r.name}-${r.cohort}`}
                   className="border-b border-zinc-100 odd:bg-white even:bg-zinc-50/80 dark:border-zinc-800 dark:odd:bg-zinc-950 dark:even:bg-zinc-900/50"
                 >
+                  <td className="px-3 py-2 whitespace-nowrap tabular-nums">
+                    {r.cohort}
+                  </td>
                   <td className="px-3 py-2 font-medium whitespace-nowrap">
                     {r.name}
                     {r.nicknameKo ? (
@@ -219,14 +217,11 @@ export function MemberStatsClient({ rows }: { rows: MemberStatRow[] }) {
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap tabular-nums">
-                    {r.cohort}
-                  </td>
                   <StatCell value={r.participationCount} />
                   <StatCell value={r.wins} />
                   <StatCell value={r.medalists} />
-                  <StatCell value={r.eagles} />
                   <StatCell value={r.holeInOnes} />
+                  <StatCell value={r.eagles} />
                 </tr>
               ))
             )}
