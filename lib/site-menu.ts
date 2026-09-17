@@ -20,7 +20,7 @@ const NAV_DEFINITION: NavDef[] = [
     href: "/members",
     label: "회원",
     card: {
-      title: "회원 관리",
+      title: "회원 명단",
       desc: "회원 목록, 검색",
     },
   },
@@ -39,7 +39,7 @@ const NAV_DEFINITION: NavDef[] = [
   },
   {
     href: "/member-stats",
-    label: "회원별 통계",
+    label: "통계",
     card: {
       title: "회원별 통계",
       desc: "참가횟수·우승·메달·이글·홀인원",
@@ -47,7 +47,7 @@ const NAV_DEFINITION: NavDef[] = [
   },
   {
     href: "/resources",
-    label: "자료실",
+    label: "자료",
     card: {
       title: "자료실",
       desc: "정관·회원 행동강령",
@@ -55,7 +55,7 @@ const NAV_DEFINITION: NavDef[] = [
   },
   {
     href: "/ask",
-    label: "AI 분석",
+    label: "AI",
     card: {
       title: "AI 분석",
       desc: "AI 데이터 통계 질문",
@@ -107,7 +107,7 @@ function applyDefaultMenuOrder(links: SiteMenuLink[]): SiteMenuLink[] {
   for (const d of DEFAULT_SITE_MENU) {
     const item = byHref.get(d.href);
     if (!item) continue;
-    out.push(item);
+    out.push({ href: d.href, label: d.label });
     used.add(d.href);
   }
   for (const l of merged) {

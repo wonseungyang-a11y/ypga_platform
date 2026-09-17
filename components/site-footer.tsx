@@ -15,13 +15,14 @@ export function SiteFooter() {
               연세대학교 · 보성고등학교 동문
             </p>
             <p className="mt-1 text-xs text-zinc-700/80 dark:text-zinc-300/75">
-              회장 김태훈, 부회장 양원승
+              총장 김태훈, 부총장 양원승
             </p>
           </div>
         </div>
-        <p className="text-center text-xs text-zinc-500 sm:text-right dark:text-zinc-400/70">
-          © 2021 YPGA. All rights reserved.
-        </p>
+        <div className="text-center text-xs leading-relaxed text-zinc-500 sm:text-right dark:text-zinc-400/70">
+          <p>© 2021 YPGA. All rights reserved.</p>
+          <p className="mt-1">문의사항은 양원승 부총장에게 연락 바랍니다.</p>
+        </div>
       </div>
     </footer>
   );

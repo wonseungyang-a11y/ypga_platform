@@ -38,8 +38,7 @@ export function MembersClient({ members }: { members: MemberCsvRow[] }) {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          총 <strong>{members.length}</strong>명 · 표시{" "}
-          <strong>{filtered.length}</strong>명
+          총 <strong>{members.length}</strong>명
         </p>
         <label className="flex max-w-md flex-1 flex-col gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">
           검색

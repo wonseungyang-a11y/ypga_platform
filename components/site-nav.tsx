@@ -1,11 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { EmblemLockup } from "@/components/emblem-lockup";
 import type { SiteMenuLink } from "@/lib/site-menu";
 
-const linkClass =
-  "text-zinc-700/90 transition-colors hover:text-yonsei dark:text-zinc-300 dark:hover:text-yonsei-200";
+function navLinkClass(active: boolean): string {
+  return [
+    "border-b pb-0.5 text-sm font-medium transition-colors",
+    active
+      ? "border-yonsei text-yonsei dark:border-yonsei-200 dark:text-yonsei-200"
+      : "border-zinc-300 text-zinc-700/90 hover:border-yonsei hover:text-yonsei dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-yonsei-200 dark:hover:text-yonsei-200",
+  ].join(" ");
+}
+
+function isActiveHref(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function SiteNav({ links }: { links: SiteMenuLink[] }) {
+  const pathname = usePathname() ?? "/";
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/85 backdrop-blur-md supports-[backdrop-filter]:bg-card/75">
       <div className="mx-auto max-w-6xl px-4 py-3.5">
@@ -35,15 +51,19 @@ export function SiteNav({ links }: { links: SiteMenuLink[] }) {
             className="flex flex-wrap gap-x-5 gap-y-2 border-t border-border/70 pt-3 text-sm font-medium lg:border-t-0 lg:pt-0"
             aria-label="주요 메뉴"
           >
-            {links.map((l, i) => (
-              <Link
-                key={`${l.href}-${i}`}
-                href={l.href}
-                className={linkClass}
-              >
-                {l.label}
-              </Link>
-            ))}
+            {links.map((l, i) => {
+              const active = isActiveHref(pathname, l.href);
+              return (
+                <Link
+                  key={`${l.href}-${i}`}
+                  href={l.href}
+                  className={navLinkClass(active)}
+                  aria-current={active ? "page" : undefined}
+                >
+                  {l.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </div>

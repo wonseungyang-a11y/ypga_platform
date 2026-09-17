@@ -264,7 +264,7 @@ function TournamentSection({
 export function TournamentsClient({ rows }: { rows: TournamentRow[] }) {
   const [q, setQ] = useState("");
 
-  const { regularRows, screenRows, displayedTotal } = useMemo(() => {
+  const { regularRows, screenRows } = useMemo(() => {
     const needle = q.trim();
     const regular = sortByDateDesc(
       rows.filter(
@@ -281,20 +281,12 @@ export function TournamentsClient({ rows }: { rows: TournamentRow[] }) {
     return {
       regularRows: regular,
       screenRows: screen,
-      displayedTotal: regular.length + screen.length,
     };
   }, [rows, q]);
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          전체 <strong>{rows.length}</strong>건 중 표시{" "}
-          <strong>{displayedTotal}</strong>건
-          {q.trim() ? (
-            <span className="text-zinc-500"> (검색어 적용)</span>
-          ) : null}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-end sm:gap-4">
         <label className="ml-auto flex w-full max-w-md flex-col gap-1 text-sm font-medium text-zinc-700 dark:text-zinc-300 sm:w-72 sm:shrink-0 sm:text-right">
           <span className="text-right">검색</span>
           <SiteSearchInput
