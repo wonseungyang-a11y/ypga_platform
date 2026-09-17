@@ -3,25 +3,35 @@
 import { useMemo, useState } from "react";
 import { SiteSearchInput } from "@/components/site-search-input";
 import type { MemberCsvRow } from "@/lib/members-csv";
+import { cohortValue, serialNoValue } from "@/lib/member-stats";
 import { matchesSearchText } from "@/lib/search-text";
+
+function compareCohortThenJoinOrder(a: MemberCsvRow, b: MemberCsvRow): number {
+  const ca = cohortValue(a.cohort);
+  const cb = cohortValue(b.cohort);
+  if (ca !== cb) return ca - cb;
+  return serialNoValue(a.serialNo) - serialNoValue(b.serialNo);
+}
 
 export function MembersClient({ members }: { members: MemberCsvRow[] }) {
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
-    if (!q.trim()) return members;
-    return members.filter((m) => {
-      const hay = [
-        m.category,
-        m.serialNo,
-        m.cohort,
-        m.name,
-        m.nicknameKo,
-        m.nicknameEn,
-        m.residence,
-      ].join(" ");
-      return matchesSearchText(hay, q);
-    });
+    const list = !q.trim()
+      ? members
+      : members.filter((m) => {
+          const hay = [
+            m.category,
+            m.serialNo,
+            m.cohort,
+            m.name,
+            m.nicknameKo,
+            m.nicknameEn,
+            m.residence,
+          ].join(" ");
+          return matchesSearchText(hay, q);
+        });
+    return [...list].sort(compareCohortThenJoinOrder);
   }, [members, q]);
 
   return (
@@ -49,11 +59,10 @@ export function MembersClient({ members }: { members: MemberCsvRow[] }) {
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
-        <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+        <table className="w-full min-w-[640px] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900">
               <th className="px-3 py-2 font-semibold">구분</th>
-              <th className="px-3 py-2 font-semibold">번호</th>
               <th className="px-3 py-2 font-semibold">기수</th>
               <th className="px-3 py-2 font-semibold">성명</th>
               <th className="px-3 py-2 font-semibold">닉네임</th>
@@ -65,7 +74,7 @@ export function MembersClient({ members }: { members: MemberCsvRow[] }) {
             {filtered.length === 0 ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={6}
                   className="px-3 py-8 text-center text-zinc-500"
                 >
                   {members.length === 0
@@ -80,9 +89,6 @@ export function MembersClient({ members }: { members: MemberCsvRow[] }) {
                   className="border-b border-zinc-100 odd:bg-white even:bg-zinc-50/80 dark:border-zinc-800 dark:odd:bg-zinc-950 dark:even:bg-zinc-900/50"
                 >
                   <td className="px-3 py-2 whitespace-nowrap">{m.category}</td>
-                  <td className="px-3 py-2 whitespace-nowrap tabular-nums">
-                    {m.serialNo}
-                  </td>
                   <td className="px-3 py-2 whitespace-nowrap">{m.cohort}</td>
                   <td className="px-3 py-2 font-medium whitespace-nowrap">
                     {m.name}
