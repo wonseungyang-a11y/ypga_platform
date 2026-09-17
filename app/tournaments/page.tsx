@@ -29,8 +29,7 @@ export default async function TournamentsPage() {
         </h1>
         <PageMarkdownBlock path="/tournaments" className="mt-3" />
         <p className="mt-2 text-zinc-700/85 dark:text-zinc-300/75">
-          정기·스크린 총회 등 대회의 일정·장소·형식·참가 인원·우승·메달리스트를
-          유형별로 나누어 검색하고 표로 확인할 수 있습니다.
+          정기·스크린 총회 등 대회의 다양한 기록을 확인할 수 있습니다.
         </p>
       </div>
 
