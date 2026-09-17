@@ -37,8 +37,7 @@ export default async function ParticipantsPage() {
         </h1>
         <PageMarkdownBlock path="/participants" className="mt-4" />
         <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
-          정기·스크린 총회 등 행사별 조 편성을 보고, 이름으로 검색하면 해당
-          인원이 속한 조 전원이 함께 표시됩니다.
+          정기·스크린 총회 등 행사별 조편성을 확인하세요. 이름으로도 검색할 수 있습니다.
         </p>
       </div>
 

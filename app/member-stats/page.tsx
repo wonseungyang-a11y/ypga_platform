@@ -39,8 +39,7 @@ export default async function MemberStatsPage() {
         </h1>
         <PageMarkdownBlock path="/member-stats" className="mt-4" />
         <p className="mt-3 text-zinc-700/85 dark:text-zinc-300/75">
-          정기총회 조편성·대회 기록만 집계합니다. 스크린 총회는 포함하지
-          않습니다. 공동 우승·공동 메달리스트는 각각 1회로 집계합니다.
+          정기총회 조편성·대회 기록만 집계합니다. 공동 우승·공동 메달리스트는 각각 1회로 집계합니다.
         </p>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
           기록 누락이나 표기 차이 등으로 통계에 오류가 있을 수 있습니다.
