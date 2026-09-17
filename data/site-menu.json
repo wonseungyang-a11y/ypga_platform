@@ -4,6 +4,7 @@
     { "href": "/members", "label": "회원" },
     { "href": "/tournaments", "label": "대회" },
     { "href": "/participants", "label": "조편성" },
+    { "href": "/member-stats", "label": "회원별 통계" },
     { "href": "/resources", "label": "자료실" },
     { "href": "/ask", "label": "AI 분석" }
   ]

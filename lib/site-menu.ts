@@ -38,6 +38,14 @@ const NAV_DEFINITION: NavDef[] = [
     },
   },
   {
+    href: "/member-stats",
+    label: "회원별 통계",
+    card: {
+      title: "회원별 통계",
+      desc: "참가횟수·우승·메달·이글·홀인원",
+    },
+  },
+  {
     href: "/resources",
     label: "자료실",
     card: {
@@ -87,7 +95,50 @@ function normalizeLinks(links: unknown): SiteMenuLink[] {
       }
     }
   }
-  return out.length > 0 ? out : DEFAULT_SITE_MENU;
+  return out.length > 0 ? applyDefaultMenuOrder(out) : DEFAULT_SITE_MENU;
+}
+
+/** 저장된 메뉴에 없는 기본 항목을 넣고, 기본 메뉴는 DEFAULT_SITE_MENU 순서를 따름 */
+function applyDefaultMenuOrder(links: SiteMenuLink[]): SiteMenuLink[] {
+  const merged = mergeMissingDefaultLinks(links);
+  const byHref = new Map(merged.map((l) => [l.href, l]));
+  const used = new Set<string>();
+  const out: SiteMenuLink[] = [];
+  for (const d of DEFAULT_SITE_MENU) {
+    const item = byHref.get(d.href);
+    if (!item) continue;
+    out.push(item);
+    used.add(d.href);
+  }
+  for (const l of merged) {
+    if (!used.has(l.href)) out.push(l);
+  }
+  return out;
+}
+
+/** 저장된 메뉴에 없는 기본 항목을 기본 순서에 맞춰 삽입 */
+function mergeMissingDefaultLinks(links: SiteMenuLink[]): SiteMenuLink[] {
+  const have = new Set(links.map((l) => l.href));
+  const missing = DEFAULT_SITE_MENU.filter((d) => !have.has(d.href));
+  if (missing.length === 0) return links;
+
+  const out = [...links];
+  for (const item of missing) {
+    const defIdx = DEFAULT_SITE_MENU.findIndex((d) => d.href === item.href);
+    let inserted = false;
+    for (let i = defIdx - 1; i >= 0; i--) {
+      const prevHref = DEFAULT_SITE_MENU[i]?.href;
+      if (!prevHref) continue;
+      const pos = out.findIndex((l) => l.href === prevHref);
+      if (pos >= 0) {
+        out.splice(pos + 1, 0, item);
+        inserted = true;
+        break;
+      }
+    }
+    if (!inserted) out.push(item);
+  }
+  return out;
 }
 
 function readMenuFromFile(): SiteMenuLink[] {

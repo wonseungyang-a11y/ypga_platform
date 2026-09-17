@@ -51,7 +51,7 @@ export default async function Home() {
           </p>
           <PageMarkdownBlock path="/" className="mt-4" />
           <p className="mt-4 text-lg leading-relaxed text-zinc-700/85 dark:text-zinc-300/75">
-            동문 골프 모임을 위한 공간입니다. 아래 메뉴에서 회원·대회·조편성·자료·
+            동문 골프 모임을 위한 공간입니다. 아래 메뉴에서 회원·대회·조편성·통계·자료·
             AI 분석을 확인하세요.
           </p>
         </header>
