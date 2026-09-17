@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageMarkdownBlock } from "@/components/page-markdown-block";
 import { buildMemberStats } from "@/lib/member-stats";
 import {
@@ -45,20 +44,6 @@ export default async function MemberStatsPage() {
         </p>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
           기록 누락이나 표기 차이 등으로 통계에 오류가 있을 수 있습니다.
-        </p>
-        <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <Link
-            href="/members"
-            className="font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
-          >
-            회원 명단 →
-          </Link>
-          <Link
-            href="/"
-            className="font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
-          >
-            홈으로
-          </Link>
         </p>
       </div>
 

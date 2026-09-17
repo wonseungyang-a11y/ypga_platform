@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageMarkdownBlock } from "@/components/page-markdown-block";
 
 export const metadata: Metadata = {
@@ -58,15 +57,6 @@ export default function ResourcesPage() {
           </li>
         ))}
       </ul>
-
-      <p className="mt-8">
-        <Link
-          href="/"
-          className="text-sm font-semibold text-yonsei underline decoration-yonsei/25 underline-offset-4 transition hover:text-yonsei-600 dark:text-yonsei-200 dark:hover:text-yonsei-100"
-        >
-          ← 홈으로
-        </Link>
-      </p>
     </div>
   );
 }
