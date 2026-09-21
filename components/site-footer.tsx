@@ -21,7 +21,7 @@ export function SiteFooter() {
         </div>
         <div className="text-center text-xs leading-relaxed text-zinc-500 sm:text-right dark:text-zinc-400/70">
           <p>© 2021 YPGA. All rights reserved.</p>
-          <p className="mt-1">문의사항은 양원승 부총장에게 연락 바랍니다.</p>
+          <p className="mt-1">*개발/관리자: 양원승</p>
         </div>
       </div>
     </footer>

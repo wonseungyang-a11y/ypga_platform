@@ -134,7 +134,7 @@ export async function analyzeWithGemini(
         model: modelName,
         safetySettings,
         generationConfig: {
-          maxOutputTokens: 8192,
+          maxOutputTokens: 65536,
           temperature: 0.4,
         },
       });

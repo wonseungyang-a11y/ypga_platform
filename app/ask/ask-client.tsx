@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { MARKDOWN_PROSE_CLASS } from "@/lib/markdown-prose-class";
@@ -24,6 +24,65 @@ type Props = {
 };
 
 const PLACEHOLDER = "질문을 입력하세요";
+const ANSWER_MIN_HEIGHT = 160;
+
+function ResizableAnswer({ markdown }: { markdown: string }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number | null>(null);
+
+  useLayoutEffect(() => {
+    setHeight(null);
+  }, [markdown]);
+
+  function onResizePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    const target = e.currentTarget;
+    target.setPointerCapture(e.pointerId);
+    const startY = e.clientY;
+    const startH = panelRef.current?.getBoundingClientRect().height ?? 0;
+
+    function onMove(ev: PointerEvent) {
+      setHeight(Math.max(ANSWER_MIN_HEIGHT, startH + ev.clientY - startY));
+    }
+    function onUp(ev: PointerEvent) {
+      target.releasePointerCapture(ev.pointerId);
+      target.removeEventListener("pointermove", onMove);
+      target.removeEventListener("pointerup", onUp);
+    }
+    target.addEventListener("pointermove", onMove);
+    target.addEventListener("pointerup", onUp);
+  }
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+      <h2 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+        결과 <span className="font-normal text-zinc-400">(Google Gemini)</span>
+      </h2>
+      <div
+        ref={panelRef}
+        style={height != null ? { height } : undefined}
+        className={
+          height != null
+            ? "mt-3 min-h-40 overflow-auto"
+            : "mt-3 min-h-40 overflow-visible"
+        }
+      >
+        <div className={MARKDOWN_PROSE_CLASS}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{markdown}</ReactMarkdown>
+        </div>
+      </div>
+      <button
+        type="button"
+        aria-label="답변 창 높이 조절"
+        title="드래그하여 높이 조절"
+        onPointerDown={onResizePointerDown}
+        className="mt-3 flex h-5 w-full cursor-ns-resize items-center justify-center rounded-md text-zinc-400 select-none hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-900 dark:hover:text-zinc-300"
+      >
+        <span className="block h-1 w-10 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+      </button>
+    </div>
+  );
+}
 
 export function AskDataClient({
   dataReady,
@@ -268,16 +327,7 @@ export function AskDataClient({
         </div>
       ) : null}
 
-      {answer ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-          <h2 className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-            결과 <span className="font-normal text-zinc-400">(Google Gemini)</span>
-          </h2>
-          <div className={`${MARKDOWN_PROSE_CLASS} mt-3`}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
-          </div>
-        </div>
-      ) : null}
+      {answer ? <ResizableAnswer markdown={answer} /> : null}
     </div>
   );
 }

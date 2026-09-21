@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Noto_Sans_KR } from "next/font/google";
+import { BackgroundMusic } from "@/components/background-music";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { getSiteMenuItems } from "@/lib/site-menu";
@@ -45,6 +46,7 @@ export default async function RootLayout({
         <SiteNav links={menuLinks} />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <BackgroundMusic />
       </body>
     </html>
   );
